@@ -1,0 +1,13 @@
+{
+  "name": "wka",
+  "version": "1.0.0",
+  "description": "wka is a simple alias manager for your terminal",
+  "main": "wka.js",
+  "scripts": {
+    "dev": "./wka.mjs"
+  },
+  "keywords": ["alias", "automatisation"],
+  "author": "sadkodev",
+  "year": "2024",
+  "license": "MIT"
+}

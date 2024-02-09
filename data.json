@@ -1,0 +1,11 @@
+{
+  "alias": [
+    {
+      "id": "01",
+      "category": "project",
+      "name": "home",
+      "prefix": "hs",
+      "path": "/home/sadkodev/"
+    }
+  ]
+}
