@@ -312,12 +312,15 @@ function layout(children, title = true) {
   footer();
 }
 
+//TODO: create a function to send msg to user when something goes wrong and provide the exact examples to used the command
 function notify(situation) {
   if (situation === "noDep") {
     return `please install dependencies to run this command \n | npm install zx | \n | yarn add zx | \n`;
   }
   if (situation === "noAlias") {
-    return `No alias found, please add new alias \n  ${data.name} -a --add \n`;
+    return `No alias found, please add new alias \n  ${
+      data.name
+    } ${chalk.underline.cyan(`-a --add alias`)} \n`;
   }
 
   if (situation === "noCategory") {
