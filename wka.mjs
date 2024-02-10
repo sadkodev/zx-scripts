@@ -237,7 +237,7 @@ function category() {}
 async function add() {
   let alias = process.argv.slice(4);
   if (alias.length === 0) {
-    parseStylesData("Please add new alias 👍", {
+    parseStylesData(`Please add new alias 🔥\n ${data.name} -a -add alias`, {
       color: "red",
       bold: false,
     });
