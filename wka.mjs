@@ -1,10 +1,49 @@
 #!/usr/bin/env zx
 // Main
-const data = await fs.readJson("./package.json");
-const pathAliasTmp = "./.aliasTemporary_history";
-const aliasFiles = await fs.readFile(pathAliasTmp, "utf-8");
 const home = await os.homedir();
+//----------------- setup -------------------
+
+async function setup() {
+  await fs.ensureDir(`${home}/.config/wka`);
+  await fs.ensureFile(`${home}/.config/wka/data.json`);
+  await fs.ensureFile(`${home}/.config/wka/.alias`);
+
+  const data = {
+    name: "wka",
+    version: "1.0.0",
+    description: "wka is a simple alias manager",
+    keywords: ["alias", "manager", "cli"],
+    author: "sadkodev",
+    year: new Date().getFullYear(),
+  };
+
+  await fs.writeJson(`${home}/.config/wka/data.json`, data);
+  await fs.writeFile(`${home}/.config/wka/.alias`, ``);
+}
+
+if (
+  !fs.existsSync(
+    `${home}/.config/wka` &&
+      `${home}/.config/wka/data.json` &&
+      `${home}/.config/wka/.alias`,
+  )
+) {
+  setup();
+}
+
+//----------------- data -------------------
+
+//TODO: Fix this issue
+let jsonData = async () => {
+  let data = await fs.readJson(`${home}/.config/wka/data.json`);
+  return data;
+};
+
+const pathAliasTmp = `${home}/.config/wka/.alias`;
+const aliasFiles = await fs.readFile(pathAliasTmp, "utf-8");
 const args = process.argv.slice(3);
+
+//----------------- actions -------------------
 
 const actions = [
   {
@@ -118,6 +157,18 @@ const generalPaths = [
     path: `${home}`,
     category: "research",
   },
+  {
+    label: "root",
+    prefix: "rt",
+    path: "/",
+    category: "important",
+  },
+  {
+    label: "testing",
+    prefix: "ts",
+    path: `${home}/testing`,
+    category: "testing",
+  },
 ];
 
 //----------------- actions -------------------
@@ -134,13 +185,13 @@ function help() {
       color: "white",
       bold: true,
     });
-    echo` ${data.name} --list or -l \n`;
+    echo` ${jsonData.name} --list or -l \n`;
   }, false);
 }
 
 function version() {
   layout(() => {
-    parseStylesData(`CLI ${data.name}: ${data.version}`, {
+    parseStylesData(`CLI ${jsonData.name}: ${jsonData.version}`, {
       color: "blue",
       bold: false,
     });
@@ -195,12 +246,12 @@ async function add() {
     return;
   } else {
     let directPath = await $`pwd`;
-    let directPathArr = directPath.toString().split("/")[3];
-    let newAlias = generalPaths.filter((item) => item.path === directPathArr && item);
-    test(directPathArr);
-    test(newAlias);
+    let parsePath = directPath.stdout.trim().split("/").slice(0, -1).join("/");
+    let prefix = generalPaths
+      .filter((path) => path.path === parsePath)
+      .map((path) => path.prefix);
 
-    let output = `alias ${alias[0]}='${directPath.stdout.trim()}'\n`;
+    let output = `alias ${prefix}-${alias[0]}='${directPath.stdout.trim()}'\n`;
     if (aliasFiles.includes(output)) {
       parseStylesData("Alias already exist 👍", {
         color: "red",
@@ -216,10 +267,6 @@ async function add() {
 function remove(params) {}
 
 function edit(params) {}
-
-function setup() {
-  test();
-}
 
 //----------------- utils -------------------
 function parseStylesData(output, { color, bold = false }) {
@@ -243,7 +290,7 @@ function separator(color = "gray") {
 
 function footer() {
   separator();
-  parseStylesData(`CopyRight © ${data.year} ${data.author}`, {
+  parseStylesData(`CopyRight © ${jsonData.year} ${jsonData.author}`, {
     color: "gray",
     bold: false,
   });
@@ -251,7 +298,7 @@ function footer() {
 
 function header(title = true) {
   if (!title) {
-    parseStylesData(`\nUsage: ${data.name} [options]`, {
+    parseStylesData(`\nUsage: ${jsonData.name} [options]`, {
       color: "magenta",
       bold: true,
     });
@@ -272,19 +319,19 @@ function notify(situation) {
     return `please install dependencies to run this command \n | npm install zx | \n | yarn add zx | \n`;
   }
   if (situation === "noAlias") {
-    return `No alias found, please add new alias \n | ${data.name} --add | \n`;
+    return `No alias found, please add new alias \n  ${jsonData.name} -a --add \n`;
   }
 
   if (situation === "noCategory") {
-    return `No category found, please add new category \n | ${data.name} --category | \n`;
+    return `No category found, please add new category \n | ${jsonData.name} --category | \n`;
   }
 
   if (situation === "noArgs") {
-    return `Please provide valid arguments \n | ${data.name} --help | \n`;
+    return `Please provide valid arguments \n | ${jsonData.name} --help | \n`;
   }
 
   if (situation === "noFile") {
-    return `No file found \n | ${data.name} --setup | \n`;
+    return `No file found \n | ${jsonData.name} --setup | \n`;
   }
 
   return `Please provide valid arguments`;
@@ -300,7 +347,7 @@ function test(msg) {
   separator("red");
 }
 
-function run() {
+async function run() {
   try {
     if (args.length === 0) {
       help();
@@ -314,7 +361,10 @@ function run() {
     }
     help();
   } catch (error) {
-    echo(error);
+    parseStylesData(error, {
+      color: "red",
+      bold: true,
+    });
   }
 }
 
