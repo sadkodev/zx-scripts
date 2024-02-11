@@ -262,9 +262,37 @@ async function add() {
   }
 }
 
-function remove(params) {}
+function remove() {
+  let alias = process.argv.slice(4);
+  if (alias.length === 0) {
+    parseStylesData(
+      `Please provide valid alias to remove 🔥\n ${data.name} -r --remove alias`,
+      {
+        color: "red",
+        bold: false,
+      },
+    );
+    return;
+  } else {
+    list();
+  }
+}
 
-function edit(params) {}
+function edit() {
+  let alias = process.argv.slice(4);
+  if (alias.length === 0) {
+    parseStylesData(
+      `Please provide valid alias to edit 🔥\n ${data.name} -e --edit alias`,
+      {
+        color: "red",
+        bold: false,
+      },
+    );
+    return;
+  } else {
+    list();
+  }
+}
 
 //----------------- utils -------------------
 function parseStylesData(output, { color, bold = false }) {
