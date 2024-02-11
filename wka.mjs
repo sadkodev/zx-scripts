@@ -262,7 +262,7 @@ async function add() {
   }
 }
 
-function remove() {
+async function remove() {
   let alias = process.argv.slice(4);
   if (alias.length === 0) {
     parseStylesData(
@@ -274,7 +274,20 @@ function remove() {
     );
     return;
   } else {
-    list();
+    parseStylesData(`Alias removed 🤬 ${alias}`, {
+      color: "green",
+      bold: false,
+    });
+    let aliasFiles = await fs.readFile(pathAliasTmp, "utf-8");
+    if (aliasFiles.includes(alias)) {
+      let newAlias = aliasFiles.replace(alias, "");
+      await fs.writeFile(pathAliasTmp, newAlias);
+    } else {
+      parseStylesData(notify("noAlias"), {
+        color: "red",
+        bold: false,
+      });
+    }
   }
 }
 
